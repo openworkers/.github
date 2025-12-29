@@ -1,8 +1,32 @@
 # OpenWorkers
 
-> **Open serverless platform.**
+OpenWorkers is an open-source serverless platform for running JavaScript/TypeScript workers. Deploy functions that scale automatically (soon™), with built-in bindings for databases, key-value storage, and object storage.
 
-OpenWorkers is an open-source serverless platform for running JavaScript/TypeScript workers at the edge. Deploy functions that scale automatically, with built-in bindings for databases, key-value storage, and object storage.
+## Repositories
+
+### Core Runtime
+
+| Repository                                                                      | Description                  | Language |
+| ------------------------------------------------------------------------------- | ---------------------------- | -------- |
+| [openworkers-runner](https://github.com/openworkers/openworkers-runner)         | Core worker execution engine | Rust     |
+| [openworkers-runtime-v8](https://github.com/openworkers/openworkers-runtime-v8) | V8 JavaScript runtime        | Rust     |
+| [openworkers-core](https://github.com/openworkers/openworkers-core)             | Shared types and traits      | Rust     |
+
+### Platform Services
+
+| Repository                                                                    | Description                          | Language       |
+| ----------------------------------------------------------------------------- | ------------------------------------ | -------------- |
+| [openworkers-api](https://github.com/openworkers/openworkers-api)             | User-facing REST API                 | TypeScript/Bun |
+| [openworkers-scheduler](https://github.com/openworkers/openworkers-scheduler) | Cron job scheduler                   | Rust           |
+| [openworkers-logs](https://github.com/openworkers/openworkers-logs)           | Log ingestion (NATS) + SSE streaming | Rust           |
+| [openworkers-cli](https://github.com/openworkers/openworkers-cli)             | Admin/infra tool                     | Rust           |
+
+### Frontend
+
+| Repository                                                                | Description             | Language  |
+| ------------------------------------------------------------------------- | ----------------------- | --------- |
+| [openworkers-dash](https://github.com/openworkers/openworkers-dash)       | User dashboard          | Angular   |
+| [openworkers-website](https://github.com/openworkers/openworkers-website) | Documentation & website | SvelteKit |
 
 ## Architecture
 
@@ -42,32 +66,6 @@ OpenWorkers is an open-source serverless platform for running JavaScript/TypeScr
 │  └────────────────────────┘ │   └───────────┘   └───────────┘
 └─────────────────────────────┘
 ```
-
-## Repositories
-
-### Core Runtime
-
-| Repository                                                                      | Description                  | Language |
-| ------------------------------------------------------------------------------- | ---------------------------- | -------- |
-| [openworkers-runner](https://github.com/openworkers/openworkers-runner)         | Core worker execution engine | Rust     |
-| [openworkers-runtime-v8](https://github.com/openworkers/openworkers-runtime-v8) | V8 JavaScript runtime        | Rust     |
-| [openworkers-core](https://github.com/openworkers/openworkers-core)             | Shared types and traits      | Rust     |
-
-### Platform Services
-
-| Repository                                                                    | Description                         | Language       |
-| ----------------------------------------------------------------------------- | ----------------------------------- | -------------- |
-| [openworkers-api](https://github.com/openworkers/openworkers-api)             | User-facing REST API                | TypeScript/Bun |
-| [openworkers-scheduler](https://github.com/openworkers/openworkers-scheduler) | Cron job scheduler                  | Rust           |
-| [openworkers-logs](https://github.com/openworkers/openworkers-logs)           | Log ingestion (NATS) + SSE streaming | Rust           |
-| [openworkers-cli](https://github.com/openworkers/openworkers-cli)             | Admin/infra tool                    | Rust           |
-
-### Frontend
-
-| Repository                                                                | Description             | Language  |
-| ------------------------------------------------------------------------- | ----------------------- | --------- |
-| [openworkers-dash](https://github.com/openworkers/openworkers-dash)       | User dashboard          | Angular   |
-| [openworkers-website](https://github.com/openworkers/openworkers-website) | Documentation & website | SvelteKit |
 
 ## Features
 
