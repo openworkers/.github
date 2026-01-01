@@ -72,13 +72,13 @@ Workers can access platform resources through bindings:
 ```javascript
 export default {
   async fetch(request, env) {
-    // Key-Value Storage
-    await env.KV.put("key", "value", { expirationTtl: 3600 });
-    const value = await env.KV.get("key");
+    // Key-Value Storage (native JSON support)
+    await env.KV.put("session", { userId: 123 }, { expiresIn: 3600 });
+    const session = await env.KV.get("session");
 
     // Database (PostgreSQL)
     const users = await env.DB.query("SELECT * FROM users WHERE id = $1", [
-      userId,
+      session.userId,
     ]);
 
     // Static Assets (S3/R2)
