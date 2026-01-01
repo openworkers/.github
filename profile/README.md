@@ -14,12 +14,13 @@ OpenWorkers is an open-source serverless platform for running JavaScript/TypeScr
 
 ### Platform Services
 
-| Repository                                                                    | Description                          | Language       |
-| ----------------------------------------------------------------------------- | ------------------------------------ | -------------- |
-| [openworkers-api](https://github.com/openworkers/openworkers-api)             | User-facing REST API                 | TypeScript/Bun |
-| [openworkers-scheduler](https://github.com/openworkers/openworkers-scheduler) | Cron job scheduler                   | Rust           |
-| [openworkers-logs](https://github.com/openworkers/openworkers-logs)           | Log ingestion (NATS) + SSE streaming | Rust           |
-| [openworkers-cli](https://github.com/openworkers/openworkers-cli)             | Admin/infra tool                     | Rust           |
+| Repository                                                                    | Description                            | Language       |
+| ----------------------------------------------------------------------------- | -------------------------------------- | -------------- |
+| [openworkers-api](https://github.com/openworkers/openworkers-api)             | User-facing REST API                   | TypeScript/Bun |
+| [openworkers-scheduler](https://github.com/openworkers/openworkers-scheduler) | Cron job scheduler                     | Rust           |
+| [openworkers-logs](https://github.com/openworkers/openworkers-logs)           | Log ingestion (NATS) + SSE streaming   | Rust           |
+| [openworkers-cli](https://github.com/openworkers/openworkers-cli)             | Admin/infra tool                       | Rust           |
+| [postgate](https://github.com/openworkers/postgate)                           | Multi-tenant HTTP proxy for PostgreSQL | Rust           |
 
 ### Frontend
 
