@@ -1,0 +1,68 @@
+{
+  "name": "OpenWorkers Multi-Repo Workspace",
+  "image": "mcr.microsoft.com/devcontainers/rust:1-bullseye",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "vadimcn.vscode-lldb",
+        "tamasfe.even-better-toml",
+        "serayuzgur.crates",
+        "oven.bun-vscode",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "rust-analyzer.cargo.features": ["v8"],
+        "rust-analyzer.checkOnSave.command": "clippy",
+        "files.watcherExclude": {
+          "**/target/**": true,
+          "**/node_modules/**": true
+        }
+      }
+    }
+  },
+
+  "postCreateCommand": "bash /workspaces/.github/.devcontainer/setup-workspace.sh",
+
+  "workspaceFolder": "/workspaces",
+
+  "mounts": [
+    "source=openworkers-cargo-cache,target=/usr/local/cargo/registry,type=volume",
+    "source=openworkers-target-cache,target=/workspaces/target,type=volume",
+    "source=openworkers-rusty-v8,target=/workspaces/rusty_v8,type=volume"
+  ],
+
+  "remoteUser": "vscode",
+
+  "containerEnv": {
+    "WORKSPACE_DIR": "/workspaces"
+  },
+
+  "forwardPorts": [3000, 5432, 4222, 8080],
+
+  "portsAttributes": {
+    "3000": {
+      "label": "OpenWorkers API",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "PostgreSQL"
+    },
+    "4222": {
+      "label": "NATS"
+    },
+    "8080": {
+      "label": "Dashboard"
+    }
+  }
+}
