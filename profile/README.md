@@ -6,11 +6,20 @@ OpenWorkers is an open-source serverless platform for running JavaScript/TypeScr
 
 ### Core Runtime
 
-| Repository                                                                      | Description                  | Language |
-| ------------------------------------------------------------------------------- | ---------------------------- | -------- |
-| [openworkers-runner](https://github.com/openworkers/openworkers-runner)         | Core worker execution engine | Rust     |
-| [openworkers-runtime-v8](https://github.com/openworkers/openworkers-runtime-v8) | V8 JavaScript runtime        | Rust     |
-| [openworkers-core](https://github.com/openworkers/openworkers-core)             | Shared types and traits      | Rust     |
+| Repository                                                                            | Description                      | Language |
+| ------------------------------------------------------------------------------------- | -------------------------------- | -------- |
+| [openworkers-runner](https://github.com/openworkers/openworkers-runner)               | Core worker execution engine     | Rust     |
+| [openworkers-task-executor](https://github.com/openworkers/openworkers-task-executor) | Standalone executor (fetch only) | Rust     |
+| [openworkers-runtime-v8](https://github.com/openworkers/openworkers-runtime-v8)       | V8 JavaScript runtime            | Rust     |
+| [openworkers-core](https://github.com/openworkers/openworkers-core)                   | Shared types and traits          | Rust     |
+
+### V8 Libraries
+
+| Repository                                          | Description                            | Language |
+| --------------------------------------------------- | -------------------------------------- | -------- |
+| [rusty-v8](https://github.com/openworkers/rusty-v8) | V8 bindings (fork with Locker support) | Rust     |
+| [serde-v8](https://github.com/openworkers/serde-v8) | Serde integration for V8 values        | Rust     |
+| [glue-v8](https://github.com/openworkers/glue-v8)   | Rust to V8 binding macros              | Rust     |
 
 ### Platform Services
 
@@ -28,6 +37,45 @@ OpenWorkers is an open-source serverless platform for running JavaScript/TypeScr
 | ------------------------------------------------------------------------- | ----------------------- | --------- |
 | [openworkers-dash](https://github.com/openworkers/openworkers-dash)       | User dashboard          | Angular   |
 | [openworkers-website](https://github.com/openworkers/openworkers-website) | Documentation & website | SvelteKit |
+
+## Standalone V8 Runtime
+
+Don't need the full platform? Use `openworkers-runtime-v8` as a standalone JavaScript runtime in your Rust application:
+
+```rust
+use openworkers_core::{Event, HttpRequest, Script};
+use openworkers_runtime_v8::Worker;
+
+#[tokio::main]
+async fn main() {
+    let code = r#"
+        addEventListener('fetch', (event) => {
+            event.respondWith(new Response('Hello from V8!'));
+        });
+    "#;
+
+    let script = Script::new(code);
+    let mut worker = Worker::new(script, None).await.unwrap();
+
+    let (event, rx) = Event::fetch(HttpRequest::get("http://localhost/"));
+    worker.exec(event).await.unwrap();
+
+    let response = rx.await.unwrap();
+    println!("Status: {}", response.status);
+}
+```
+
+Add to your `Cargo.toml`:
+
+```toml
+[dependencies]
+openworkers-runtime-v8 = "0.8"
+openworkers-core = "0.8"
+tokio = { version = "1", features = ["full"] }
+```
+
+See [openworkers-runtime-v8](https://github.com/openworkers/openworkers-runtime-v8) for full documentation.
+See [openworkers-task-executor](https://github.com/openworkers/openworkers-task-executor) for a complete implementation example.
 
 ## Architecture
 
