@@ -104,6 +104,8 @@ See [openworkers-task-executor](https://github.com/openworkers/openworkers-task-
 
 Single database. Components marked with `*` connect to PostgreSQL.
 
+> **Note:** `api` and `dashboard` are intended to become userland services (served as regular workers).
+
 ## Features
 
 ### Worker Runtime
