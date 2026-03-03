@@ -84,17 +84,17 @@ See [openworkers-task-executor](https://github.com/openworkers/openworkers-task-
                          │  nginx (proxy)  │
                          └────────┬────────┘
                                   │
-         ┌───────────────┬────────┴──┬───────────────┐
-         │               │           │               │
-         │               │           │               │
-┌────────┸────────┐ ┌────┸────┐ ┌────┸────┐ ┌────────┸────────┐
-│   dashboard     │ │  api    │ │ logs *  │ │  runner (x3) *  │
-└─────────────────┘ └────┬────┘ └────┰────┘ └────────┰────────┘
-                         │           │               │
-                         │           │               │
-                ┌────────┸────────┐  │      ┌────────┸────────┐
-                │   postgate *    │  └──────┥      nats       │
-                └─────────────────┘         └────────┰────────┘
+         ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌╌╌─┴──┬───────────────┐
+         ╎               ╎           │               │
+         ╎               ╎           │ sse/ws        │ http
+┌╌╌╌╌╌╌╌╌┸╌╌╌╌╌╌╌┐   ┌╌╌╌┸╌╌╌┐  ┌────┸────┐    ┌─────┸───────┐
+╎   dashboard    ╎   ╎  api  ╎  │ logs *  │    │   runner *  │
+└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘   └╌╌╌┬╌╌╌┘  └────┰────┘    └─────┰───────┘
+                         ╎           │               │
+                         ╎           │               │
+                ┌╌╌╌╌╌╌╌╌┸╌╌╌╌╌╌╌╌┐  │      ┌────────┸────────┐
+                ╎   postgate *    ╎  └──────┥      nats       │
+                └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘         └────────┰────────┘
                                                      │
                                                      │
                 ┌─────────────────┐           ┌──────┴───────┐
@@ -104,7 +104,9 @@ See [openworkers-task-executor](https://github.com/openworkers/openworkers-task-
 
 Single database. Components marked with `*` connect to PostgreSQL.
 
-> **Note:** `api` and `dashboard` are intended to become userland services (served as regular workers).
+Note that `dashboard` and `api` can now be run directly as workers (`postgate` is in that case optional too as workerized api has runtime bindings to database).
+
+Services `logs` and `scheduler` are not required for the core runtime but provide additional functionality (log streaming and cron jobs).
 
 ## Features
 
