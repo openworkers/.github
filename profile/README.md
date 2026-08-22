@@ -1,25 +1,45 @@
 # OpenWorkers
 
-OpenWorkers is an open-source serverless platform for running JavaScript/TypeScript workers. Deploy functions that scale automatically (soon™), with built-in bindings for databases, key-value storage, and object storage.
+OpenWorkers is an open-source serverless platform for running JavaScript, TypeScript and Rust (WebAssembly) workers, with built-in bindings for databases, key-value storage, and object storage.
 
 ## Repositories
 
 ### Core Runtime
 
-| Repository                                                                            | Description                      | Language |
-| ------------------------------------------------------------------------------------- | -------------------------------- | -------- |
-| [openworkers-runner](https://github.com/openworkers/openworkers-runner)               | Core worker execution engine     | Rust     |
-| [openworkers-task-executor](https://github.com/openworkers/openworkers-task-executor) | Standalone executor (fetch only) | Rust     |
-| [openworkers-runtime-v8](https://github.com/openworkers/openworkers-runtime-v8)       | V8 JavaScript runtime            | Rust     |
-| [openworkers-core](https://github.com/openworkers/openworkers-core)                   | Shared types and traits          | Rust     |
+| Repository                                                                            | Description                                            | Language |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------ | -------- |
+| [openworkers-runner](https://github.com/openworkers/openworkers-runner)               | Worker execution engine, serves JavaScript and wasm    | Rust     |
+| [openworkers-task-executor](https://github.com/openworkers/openworkers-task-executor) | Standalone executor (fetch only)                       | Rust     |
+| [openworkers-core](https://github.com/openworkers/openworkers-core)                   | Shared types and traits                                | Rust     |
+
+### Runtimes
+
+| Repository                                                                          | Description                                          | Language |
+| ----------------------------------------------------------------------------------- | ---------------------------------------------------- | -------- |
+| [openworkers-runtime-v8](https://github.com/openworkers/openworkers-runtime-v8)     | V8 JavaScript runtime (production)                   | Rust     |
+| [openworkers-runtime-wasm](https://github.com/openworkers/openworkers-runtime-wasm) | WebAssembly components on wasmtime (`wasi:http`)     | Rust     |
+| [openworkers-runtime-jsc](https://github.com/openworkers/openworkers-runtime-jsc)   | JavaScriptCore runtime                               | Rust     |
+| [openworkers-runtime-quickjs](https://github.com/openworkers/openworkers-runtime-quickjs) | QuickJS runtime                               | Rust     |
+| [openworkers-runtime-boa](https://github.com/openworkers/openworkers-runtime-boa)   | Boa runtime                                          | Rust     |
+| [openworkers-runtime-nova](https://github.com/openworkers/openworkers-runtime-nova) | Nova runtime (experimental)                          | Rust     |
+| [openworkers-conformance](https://github.com/openworkers/openworkers-conformance)   | Cross-engine conformance suite, one recorded oracle  | Rust     |
+
+### Worker SDKs & Adapters
+
+| Repository                                                                  | Description                                            | Language   |
+| --------------------------------------------------------------------------- | ------------------------------------------------------ | ---------- |
+| [openworkers-worker](https://github.com/openworkers/openworkers-worker)     | Rust guest SDK, API-compatible with `worker` 0.8       | Rust       |
+| [workers-types](https://github.com/openworkers/workers-types)               | TypeScript types for the worker runtime                | TypeScript |
+| [adapter-sveltekit](https://github.com/openworkers/adapter-sveltekit)       | Deploy SvelteKit apps as workers (SSR)                 | TypeScript |
+| [adapter-static](https://github.com/openworkers/adapter-static)             | Deploy static sites as workers                         | TypeScript |
 
 ### V8 Libraries
 
-| Repository                                          | Description                            | Language |
-| --------------------------------------------------- | -------------------------------------- | -------- |
-| [rusty-v8](https://github.com/openworkers/rusty-v8) | V8 bindings (fork with Locker support) | Rust     |
-| [serde-v8](https://github.com/openworkers/serde-v8) | Serde integration for V8 values        | Rust     |
-| [glue-v8](https://github.com/openworkers/glue-v8)   | Rust to V8 binding macros              | Rust     |
+| Repository                                          | Description                                | Language |
+| --------------------------------------------------- | ------------------------------------------ | -------- |
+| [rusty-v8](https://github.com/openworkers/rusty-v8) | V8 bindings and prebuilt binaries          | Rust     |
+| [serde-v8](https://github.com/openworkers/serde-v8) | Serde integration for V8 values            | Rust     |
+| [glue-v8](https://github.com/openworkers/glue-v8)   | Rust to V8 binding macros                  | Rust     |
 
 ### Platform Services
 
@@ -30,6 +50,7 @@ OpenWorkers is an open-source serverless platform for running JavaScript/TypeScr
 | [openworkers-logs](https://github.com/openworkers/openworkers-logs)           | Log ingestion (NATS) + SSE streaming   | Rust           |
 | [openworkers-cli](https://github.com/openworkers/openworkers-cli)             | Admin/infra tool                       | Rust           |
 | [postgate](https://github.com/openworkers/postgate)                           | Multi-tenant HTTP proxy for PostgreSQL | Rust           |
+| [openworkers-infra](https://github.com/openworkers/openworkers-infra)         | Docker Compose deployment              | -              |
 
 ### Frontend
 
@@ -69,8 +90,8 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-openworkers-runtime-v8 = "0.8"
-openworkers-core = "0.8"
+openworkers-runtime-v8 = { git = "https://github.com/openworkers/openworkers-runtime-v8", tag = "v0.15.0" }
+openworkers-core = { git = "https://github.com/openworkers/openworkers-core", tag = "v0.15.0" }
 tokio = { version = "1", features = ["full"] }
 ```
 
@@ -80,31 +101,33 @@ See [openworkers-task-executor](https://github.com/openworkers/openworkers-task-
 ## Architecture
 
 ```
-                         ┌─────────────────┐
-                         │  nginx (proxy)  │
-                         └────────┬────────┘
-                                  │
-         ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┬╌╌╌╌╌╌╌─┴──┬───────────────┐
-         ╎               ╎           │               │
-         ╎               ╎           │ sse/ws        │ http
-┌╌╌╌╌╌╌╌╌┸╌╌╌╌╌╌╌┐   ┌╌╌╌┸╌╌╌┐  ┌────┸────┐    ┌─────┸───────┐
-╎   dashboard    ╎   ╎  api  ╎  │ logs *  │    │   runner *  │
-└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘   └╌╌╌┬╌╌╌┘  └────┰────┘    └─────┰───────┘
-                         ╎           │               │
-                         ╎           │               │
-                ┌╌╌╌╌╌╌╌╌┸╌╌╌╌╌╌╌╌┐  │      ┌────────┸────────┐
-                ╎   postgate *    ╎  └──────┥      nats       │
-                └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘         └────────┰────────┘
-                                                     │
-                                                     │
-                ┌─────────────────┐           ┌──────┴───────┐
-         * ─────┥   PostgreSQL    │           │ scheduler *  │
-                └─────────────────┘           └──────────────┘
+                     ┌─────────────────┐
+                     │  nginx (proxy)  │
+                     └────────┬────────┘
+                              │
+               ┌──────────────┴──────────────┐
+               │                             │
+      ┌────────┴────────┐          ┌─────────┴─────────┐
+      │  runner (x3) *  │          │      logs *       │
+      │                 │          │                   │
+      │  every worker,  │          │  SSE log stream   │
+      │  api included   │          │                   │
+      └────────┬────────┘          └─────────┬─────────┘
+               │                             │
+               └──────────────┬──────────────┘
+                              │
+                    ┌─────────┴─────────┐
+                    │       nats        │
+                    └─────────┬─────────┘
+                              │
+                    ┌─────────┴─────────┐
+                    │    scheduler *    │
+                    └───────────────────┘
 ```
 
-Single database. Components marked with `*` connect to PostgreSQL.
+Single database. Components marked with `*` read and write PostgreSQL.
 
-Note that `dashboard` and `api` can now be run directly as workers (`postgate` is in that case optional too as workerized api has runtime bindings to database).
+The `dashboard` and `api` run as workers on the platform itself (dogfooding); `postgate` is then optional, since the workerized api reaches the database through its runtime binding.
 
 Services `logs` and `scheduler` are not required for the core runtime but provide additional functionality (log streaming and cron jobs).
 
@@ -113,6 +136,7 @@ Services `logs` and `scheduler` are not required for the core runtime but provid
 ### Worker Runtime
 
 - **JavaScript/TypeScript** execution via V8
+- **Rust workers** as native WebAssembly components (`wasm32-wasip2`), with a workers-rs-compatible SDK
 - **Web-standard APIs**: `fetch()`, `Request`, `Response`, `Headers`, `crypto`, `TextEncoder/Decoder`
 - **Streaming support**: ReadableStream, WritableStream
 - **Console logging** with structured output
@@ -170,7 +194,7 @@ export default {
 
 ### Prerequisites
 
-- Rust 1.75+
+- Rust 1.85+
 - Bun 1.0+
 - PostgreSQL 15+
 - NATS Server
@@ -183,13 +207,14 @@ git clone https://github.com/openworkers/openworkers-runner.git
 git clone https://github.com/openworkers/openworkers-api.git
 
 # Start the runner
-cd openworkers-runner && cargo run
+cd openworkers-runner && cargo run --features v8
 
-# Start the API (in another terminal)
+# Start the API dev loop (in another terminal)
 cd openworkers-api && bun install && bun run dev
 ```
 
-See individual repository READMEs for detailed setup instructions.
+For a full self-hosted platform, follow
+[openworkers-infra](https://github.com/openworkers/openworkers-infra)'s GETTING_STARTED.
 
 ## Design Principles
 
@@ -205,11 +230,11 @@ See individual repository READMEs for detailed setup instructions.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT, across the organization.
 
 ## Contributing
 
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) before submitting a PR.
+Contributions are welcome - open an issue or a pull request on the relevant repository.
 
 ---
 
