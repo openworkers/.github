@@ -57,6 +57,8 @@ OpenWorkers is an open-source serverless platform for running JavaScript, TypeSc
 | [openworkers-scheduler](https://github.com/openworkers/openworkers-scheduler) | openworkers-runner v1.15.0 (crons)              |
 | [openworkers-logs](https://github.com/openworkers/openworkers-logs)           | openworkers-runner v1.15.0 (log storage, SSE)   |
 | [openworkers-dash](https://github.com/openworkers/openworkers-dash)           | openworkers-api (dashboard UI)                  |
+| [openworkers-runtime-deno](https://github.com/openworkers/openworkers-runtime-deno) | openworkers-runtime-v8               |
+| [openworkers-scheduler-js](https://github.com/openworkers/openworkers-scheduler-js) | openworkers-runner v1.15.0 (crons)   |
 
 ### Frontend
 
