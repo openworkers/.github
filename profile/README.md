@@ -8,7 +8,7 @@ OpenWorkers is an open-source serverless platform for running JavaScript, TypeSc
 
 | Repository                                                                            | Description                                            | Language |
 | ------------------------------------------------------------------------------------- | ------------------------------------------------------ | -------- |
-| [openworkers-runner](https://github.com/openworkers/openworkers-runner)               | Worker execution engine, serves JavaScript and wasm    | Rust     |
+| [openworkers-runner](https://github.com/openworkers/openworkers-runner)               | Serves HTTP, runs workers and crons, stores the logs   | Rust     |
 | [openworkers-task-executor](https://github.com/openworkers/openworkers-task-executor) | Standalone executor (fetch only)                       | Rust     |
 | [openworkers-core](https://github.com/openworkers/openworkers-core)                   | Shared types and traits                                | Rust     |
 
@@ -46,11 +46,16 @@ OpenWorkers is an open-source serverless platform for running JavaScript, TypeSc
 | Repository                                                                    | Description                            | Language       |
 | ----------------------------------------------------------------------------- | -------------------------------------- | -------------- |
 | [openworkers-api](https://github.com/openworkers/openworkers-api)             | User-facing REST API                   | TypeScript/Bun |
-| [openworkers-scheduler](https://github.com/openworkers/openworkers-scheduler) | Cron job scheduler                     | Rust           |
-| [openworkers-logs](https://github.com/openworkers/openworkers-logs)           | Log ingestion (NATS) + SSE streaming   | Rust           |
 | [openworkers-cli](https://github.com/openworkers/openworkers-cli)             | Admin/infra tool                       | Rust           |
 | [postgate](https://github.com/openworkers/postgate)                           | Multi-tenant HTTP proxy for PostgreSQL | Rust           |
 | [openworkers-infra](https://github.com/openworkers/openworkers-infra)         | Docker Compose deployment              | -              |
+
+### Archived
+
+| Repository                                                                    | Replaced by                                     |
+| ----------------------------------------------------------------------------- | ----------------------------------------------- |
+| [openworkers-scheduler](https://github.com/openworkers/openworkers-scheduler) | openworkers-runner v1.15.0 (crons)              |
+| [openworkers-logs](https://github.com/openworkers/openworkers-logs)           | openworkers-runner v1.15.0 (log storage, SSE)   |
 
 ### Frontend
 
@@ -101,35 +106,25 @@ See [openworkers-task-executor](https://github.com/openworkers/openworkers-task-
 ## Architecture
 
 ```
-                     ┌─────────────────┐
-                     │  nginx (proxy)  │
-                     └────────┬────────┘
-                              │
-               ┌──────────────┴──────────────┐
-               │                             │
-      ┌────────┴────────┐          ┌─────────┴─────────┐
-      │  runner (x3) *  │          │      logs *       │
-      │                 │          │                   │
-      │  every worker,  │          │  SSE log stream   │
-      │  api included   │          │                   │
-      └────────┬────────┘          └─────────┬─────────┘
-               │                             │
-               └──────────────┬──────────────┘
-                              │
-                    ┌─────────┴─────────┐
-                    │       nats        │
-                    └─────────┬─────────┘
-                              │
-                    ┌─────────┴─────────┐
-                    │    scheduler *    │
-                    └───────────────────┘
+        clients (HTTP, HTTPS)
+                 |
+     +-----------+-----------+
+     |        runner         |
+     |                       |
+     |  every worker, api    |
+     |  included; crons;     |
+     |  console logs         |
+     +-----------+-----------+
+                 |
+     +-----------+-----------+
+     |      PostgreSQL       |
+     +-----------------------+
 ```
 
-Single database. Components marked with `*` read and write PostgreSQL.
+One runner per platform database. The database holds the workers, the cron
+schedules and the console logs.
 
 The `dashboard` and `api` run as workers on the platform itself (dogfooding); `postgate` is then optional, since the workerized api reaches the database through its runtime binding.
-
-Services `logs` and `scheduler` are not required for the core runtime but provide additional functionality (log streaming and cron jobs).
 
 ## Features
 
@@ -197,7 +192,6 @@ export default {
 - Rust 1.85+
 - Bun 1.0+
 - PostgreSQL 15+
-- NATS Server
 
 ### Quick Start
 
