@@ -45,7 +45,7 @@ OpenWorkers is an open-source serverless platform for running JavaScript, TypeSc
 
 | Repository                                                                    | Description                            | Language       |
 | ----------------------------------------------------------------------------- | -------------------------------------- | -------------- |
-| [openworkers-api](https://github.com/openworkers/openworkers-api)             | User-facing REST API                   | TypeScript/Bun |
+| [openworkers-api](https://github.com/openworkers/openworkers-api)             | Dashboard and REST API (SvelteKit)     | TypeScript/Bun |
 | [openworkers-cli](https://github.com/openworkers/openworkers-cli)             | Admin/infra tool                       | Rust           |
 | [postgate](https://github.com/openworkers/postgate)                           | Multi-tenant HTTP proxy for PostgreSQL | Rust           |
 | [openworkers-infra](https://github.com/openworkers/openworkers-infra)         | Docker Compose deployment              | -              |
@@ -56,12 +56,12 @@ OpenWorkers is an open-source serverless platform for running JavaScript, TypeSc
 | ----------------------------------------------------------------------------- | ----------------------------------------------- |
 | [openworkers-scheduler](https://github.com/openworkers/openworkers-scheduler) | openworkers-runner v1.15.0 (crons)              |
 | [openworkers-logs](https://github.com/openworkers/openworkers-logs)           | openworkers-runner v1.15.0 (log storage, SSE)   |
+| [openworkers-dash](https://github.com/openworkers/openworkers-dash)           | openworkers-api (dashboard UI)                  |
 
 ### Frontend
 
 | Repository                                                                | Description             | Language  |
 | ------------------------------------------------------------------------- | ----------------------- | --------- |
-| [openworkers-dash](https://github.com/openworkers/openworkers-dash)       | User dashboard          | Angular   |
 | [openworkers-website](https://github.com/openworkers/openworkers-website) | Documentation & website | SvelteKit |
 
 ## Standalone V8 Runtime
@@ -124,7 +124,7 @@ See [openworkers-task-executor](https://github.com/openworkers/openworkers-task-
 One runner per platform database. The database holds the workers, the cron
 schedules and the console logs.
 
-The `dashboard` and `api` run as workers on the platform itself (dogfooding); `postgate` is then optional, since the workerized api reaches the database through its runtime binding.
+The dashboard and the API are one worker, `openworkers-api`, on the platform itself (dogfooding); `postgate` is then optional, since the workerized api reaches the database through its runtime binding.
 
 ## Features
 
