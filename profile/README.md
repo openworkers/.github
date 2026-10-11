@@ -107,24 +107,7 @@ See [openworkers-task-executor](https://github.com/openworkers/openworkers-task-
 
 ## Architecture
 
-```
-        clients (HTTP, HTTPS)
-                 |
-     +-----------+-----------+
-     |        runner         |
-     |                       |
-     |  every worker, api    |
-     |  included; crons;     |
-     |  console logs         |
-     +-----------+-----------+
-                 |
-     +-----------+-----------+
-     |      PostgreSQL       |
-     +-----------------------+
-```
-
-One runner per platform database. The database holds the workers, the cron
-schedules and the console logs.
+One runner serves HTTP and HTTPS, runs every worker (the dashboard and API included), starts the crons and stores the console logs. It needs one PostgreSQL database, and one runner runs per database.
 
 The dashboard and the API are one worker, `openworkers-api`, on the platform itself (dogfooding); `postgate` is then optional, since the workerized api reaches the database through its runtime binding.
 
